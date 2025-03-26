@@ -16,16 +16,19 @@ export const goodsFromServer: string[] = [
   'Garlic',
 ];
 
-type SortField = '' | typeof SORT_FIELD_ABC | typeof SORT_FIELD_LENGTH;
+enum SortType {
+  NONE = '',
+  ABC = 'abc',
+  LENGTH = 'length',
+}
+
+type SortField = SortType;
 type DirectionOrder = 'asc' | 'desc';
 
 interface SortOptions {
-  sortField: SortField;
+  sortField: SortType;
   directionOrder: DirectionOrder;
 }
-
-const SORT_FIELD_ABC = 'abc';
-const SORT_FIELD_LENGTH = 'length';
 
 function getPreparedGoods(
   goodFromServer: string[],
@@ -33,13 +36,13 @@ function getPreparedGoods(
 ): string[] {
   const preparedGoods = [...goodFromServer];
 
-  if (sortField) {
+  if (sortField !== SortType.NONE) {
     preparedGoods.sort((good1, good2) => {
       switch (sortField) {
-        case SORT_FIELD_ABC:
+        case SortType.ABC:
           return good1.localeCompare(good2);
 
-        case SORT_FIELD_LENGTH:
+        case SortType.LENGTH:
           return good1.length - good2.length;
 
         default:
@@ -56,7 +59,7 @@ function getPreparedGoods(
 }
 
 export const App: React.FC = () => {
-  const [sortField, setSortField] = useState<SortField>('');
+  const [sortField, setSortField] = useState<SortField>(SortType.NONE);
   const [directionOrder, setDirectionOrder] = useState<DirectionOrder>('asc');
 
   const visibleGoods = getPreparedGoods(goodsFromServer, {
@@ -68,8 +71,8 @@ export const App: React.FC = () => {
     setDirectionOrder(prevOrder => (prevOrder === 'asc' ? 'desc' : 'asc'));
   };
 
-  const resetOrder = () => {
-    setSortField('');
+  const handleReverseOrder = () => {
+    setSortField(SortType.NONE);
     setDirectionOrder('asc');
   };
 
@@ -77,19 +80,19 @@ export const App: React.FC = () => {
     <div className="section content">
       <div className="buttons">
         <button
-          onClick={() => setSortField(SORT_FIELD_ABC)}
+          onClick={() => setSortField(SortType.ABC)}
           type="button"
           className={cn('button', 'is-info', {
-            'is-light': sortField !== SORT_FIELD_ABC,
+            'is-light': sortField !== SortType.ABC,
           })}
         >
           Sort alphabetically
         </button>
         <button
-          onClick={() => setSortField(SORT_FIELD_LENGTH)}
+          onClick={() => setSortField(SortType.LENGTH)}
           type="button"
           className={cn('button', 'is-success', {
-            'is-light': sortField !== SORT_FIELD_LENGTH,
+            'is-light': sortField !== SortType.LENGTH,
           })}
         >
           Sort by length
@@ -105,7 +108,7 @@ export const App: React.FC = () => {
         </button>
         {sortField || directionOrder !== 'asc' ? (
           <button
-            onClick={resetOrder}
+            onClick={handleReverseOrder}
             type="button"
             className={cn('button', 'is-danger', 'is-light')}
           >
