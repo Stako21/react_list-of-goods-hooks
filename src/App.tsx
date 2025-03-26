@@ -56,7 +56,6 @@ function getPreparedGoods(
 }
 
 export const App: React.FC = () => {
-
   const [sortField, setSortField] = useState<SortField>('');
   const [directionOrder, setDirectionOrder] = useState<DirectionOrder>('asc');
 
